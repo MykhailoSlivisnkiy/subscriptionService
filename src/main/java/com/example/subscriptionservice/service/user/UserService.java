@@ -3,7 +3,6 @@ package com.example.subscriptionservice.service.user;
 import com.example.subscriptionservice.dto.UserShopInfoDto;
 import com.example.subscriptionservice.entity.Shop;
 import com.example.subscriptionservice.entity.User;
-import com.example.subscriptionservice.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @AllArgsConstructor
 public class UserService {
-    private UserRepository userRepository;
 
     public ResponseEntity<User> getCurrentUser(String token) {
         return new RestTemplate().postForEntity(
@@ -22,20 +20,38 @@ public class UserService {
     }
 
     public UserShopInfoDto getUserInformationRelatedToShop(Long shopId, String token) {
+
+        boolean isUserSubscribed;
+        boolean isUserFavoriteShop;
+
         User user =  getCurrentUser(token).getBody();
 
         assert user != null;
 
         if(user.getSubscribedShops() == null || user.getSubscribedShops().isEmpty()) {
-            return  new UserShopInfoDto(false);
+            isUserSubscribed = false;
+        } else {
+            Shop shop = user.getSubscribedShops().stream()
+                    .filter(item -> item.getId().equals(shopId))
+                    .findAny()
+                    .orElse(null);
+
+            isUserSubscribed = shop != null;
         }
 
-        Shop shop = user.getSubscribedShops().stream()
-                .filter(item -> item.getId().equals(shopId))
-                .findAny()
-                .orElse(null);
+        if(user.getFavoriteShops() == null || user.getFavoriteShops().isEmpty()) {
+            isUserFavoriteShop = false;
+        } else {
+            Shop shop = user.getFavoriteShops().stream()
+                    .filter(item -> item.getId().equals(shopId))
+                    .findAny()
+                    .orElse(null);
 
-        return new UserShopInfoDto(shop != null);
+            isUserFavoriteShop = shop != null;
+        }
+
+
+        return new UserShopInfoDto(isUserSubscribed, isUserFavoriteShop);
     }
 
 }

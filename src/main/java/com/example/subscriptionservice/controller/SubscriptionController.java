@@ -19,7 +19,7 @@ public class SubscriptionController {
     private final UserService userService;
 
     @GetMapping
-    public UserShopInfoDto verifyUserSubscription(@RequestParam(name = "shopId") Long shopId, @RequestParam(name = "token") String token) {
+    public UserShopInfoDto getUserInformationRelatedToShop(@RequestParam(name = "shopId") Long shopId, @RequestParam(name = "token") String token) {
 
         return userService.getUserInformationRelatedToShop(shopId, token);
     }

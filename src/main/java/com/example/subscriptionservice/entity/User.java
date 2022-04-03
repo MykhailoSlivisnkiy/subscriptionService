@@ -40,5 +40,12 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName="id"),
             inverseJoinColumns = @JoinColumn(name = "shop_id", referencedColumnName="id"))
     List<Shop> subscribedShops;
+
+    @ManyToMany
+    @JoinTable(
+            name = "favorite_user_shop",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "shop_id"))
+    List<Shop> favoriteShops;
 }
 
